@@ -10,6 +10,8 @@ import tech.buildrun.magalums.dtos.ScheduleNotificationDto;
 import tech.buildrun.magalums.entity.Notification;
 import tech.buildrun.magalums.service.NotificationService;
 
+import java.util.List;
+
 @Getter
 @Setter
 @RestController
@@ -21,6 +23,11 @@ public class NotificationController {
     @Autowired
     public NotificationController(NotificationService notificationService) {
         this.notificationService = notificationService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Notification>> getAllNotifications() {
+        return ResponseEntity.status(HttpStatus.OK).body(this.notificationService.getAllNotification());
     }
 
     @GetMapping("/{notificationId}")

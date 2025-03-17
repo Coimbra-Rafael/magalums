@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tech.buildrun.magalums.dtos.ScheduleNotificationDto;
+import tech.buildrun.magalums.entity.Channel;
 import tech.buildrun.magalums.entity.Notification;
 import tech.buildrun.magalums.entity.Status;
 import tech.buildrun.magalums.repository.NotificationRepository;
@@ -20,10 +21,16 @@ import java.util.function.Consumer;
 @Service
 public class NotificationService {
     private final NotificationRepository notificationRepository;
+    private final EmailService emailService;
 
     @Autowired
-    public NotificationService(NotificationRepository notificationRepository) {
+    public NotificationService(NotificationRepository notificationRepository, EmailService emailService) {
         this.notificationRepository = notificationRepository;
+        this.emailService = emailService;
+    }
+
+    public List<Notification> getAllNotification () {
+        return this.notificationRepository.findAll();
     }
 
     public Optional<Notification> findById(Long notificationId){
@@ -58,7 +65,9 @@ public class NotificationService {
     private Consumer<Notification> sendNotification() {
         return notification -> {
             //TODO - REALIZAR O ENVIO da NOTIFICAÇÃO
-
+            if(notification.getChannel().getChannelId().equals(Channel.Values.EMAIL.toChannel().getChannelId())){
+                this.emailService.sendEmailSimple("E-mail de destino", "Seja bem vindo", notification.getMessage());
+            }
             notification.setStatus(Status.Values.SUCCESS.toStatus());
             this.notificationRepository.save(notification);
         };
